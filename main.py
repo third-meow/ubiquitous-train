@@ -32,7 +32,9 @@ def display_mistakes(mdl):
             try:
                 show_flat_img(xtest[i], ytest[i])
             except KeyboardInterrupt:
+                print('..Closing pyplot..')
                 plt.close()
+                break
 
 #main script
 def main():
@@ -49,14 +51,14 @@ def main():
         mdl = keras.models.Sequential()
 
         #add hidden layers
-        mdl.add(keras.layers.Dense(300, activation=tf.nn.elu))
-        mdl.add(keras.layers.Dense(300, activation=tf.nn.elu))
-        mdl.add(keras.layers.Dense(300, activation=tf.nn.elu))
+        mdl.add(keras.layers.Dense(600, activation=tf.nn.tanh))
+        mdl.add(keras.layers.Dense(350, activation=tf.nn.elu))
+        mdl.add(keras.layers.Dense(350, activation=tf.nn.elu))
 
         #add final layer
         mdl.add(keras.layers.Dense(10, activation=tf.nn.sigmoid))
 
-        #TODO find other optimizer / loss
+        #TODO try other optimizer / loss
         #complie model
         mdl.compile(optimizer='adam', loss='sparse_categorical_crossentropy',
                 metrics=['accuracy'])
