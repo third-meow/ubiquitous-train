@@ -1,4 +1,5 @@
 
+import sys
 from mnist_reader import load_mnist
 import pickle
 import numpy as np
@@ -18,29 +19,60 @@ xtrain = keras.utils.normalize(xtrain, axis=1)
 xtest = keras.utils.normalize(xtest, axis=1)
 
 #reshape and display image with pyplot
-def show_flat_img(img):
+def show_flat_img(img, title=None):
+    if title is not None:
+        plt.title(title)
     plt.imshow(img.reshape((28,28)))
     plt.show()
 
+def display_mistakes(mdl):
+    prediction = mdl.predict(xtest)
+    for i in range(len(xtest)):
+        if np.argmax(prediction[i]) != ytest[i]:
+            try:
+                show_flat_img(xtest[i], ytest[i])
+            except KeyboardInterrupt:
+                plt.close()
+
 #main script
 def main():
-    #create model
-    mdl = keras.models.Sequential()
 
-    #add hidden layers
-    mdl.add(keras.layers.Dense(300, activation=tf.nn.relu))
-    mdl.add(keras.layers.Dense(300, activation=tf.nn.relu))
-    mdl.add(keras.layers.Dense(300, activation=tf.nn.relu))
+    if sys.argv[1] == 'load':
+        try:
+            mdl = keras.models.load_model('latest_model.model')
+        except Exception as e:
+            print(e.message, e.args)
+            print('Loading model failed, try running without "load" argument')
+            quit()
+    else:
+        #create model
+        mdl = keras.models.Sequential()
 
-    #add final layer
-    mdl.add(keras.layers.Dense(10, activation=tf.nn.softmax))
+        #add hidden layers
+        mdl.add(keras.layers.Dense(300, activation=tf.nn.elu))
+        mdl.add(keras.layers.Dense(300, activation=tf.nn.elu))
+        mdl.add(keras.layers.Dense(300, activation=tf.nn.elu))
 
-    mdl.compile(optimizer='adam', loss='sparse_categorical_crossentropy',
+        #add final layer
+        mdl.add(keras.layers.Dense(10, activation=tf.nn.sigmoid))
+
+        #TODO find other optimizer / loss
+        #complie model
+        mdl.compile(optimizer='adam', loss='sparse_categorical_crossentropy',
                 metrics=['accuracy'])
 
-    mdl.fit(xtrain, ytrain, epochs=8, verbose=1)
+        mdl.fit(xtrain, ytrain, epochs=8, verbose=1)
 
-    print(mdl.evaluate(xtest, ytest, verbose=1))
+        mdl.save('latest_model.model')
+
+    #evaluate 15 times, then average
+    results = []
+    for i in range(15):
+        results.append(mdl.evaluate(xtest, ytest, verbose=1)[1])
+    print(np.average(results))
+
+    display_mistakes(mdl)
+
 
 #if this is the main module, run main
 if __name__ == '__main__':
