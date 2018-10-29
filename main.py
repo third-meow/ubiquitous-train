@@ -25,7 +25,16 @@ def main():
     mdl = keras.models.Sequential()
 
     #add hidden layers
-    mdl.add(keras.layers.Dense(600, activation=tf.nn.tanh))
+    mdl.add(keras.layers.Conv2D(256, (3,3), input_shape=(28,28,1)))
+    mdl.add(keras.layers.Activation('relu'))
+    mdl.add(keras.layers.MaxPooling2D(pool_size=(2, 2)))
+
+    mdl.add(keras.layers.Conv2D(256, (3,3)))
+    mdl.add(keras.layers.Activation('relu'))
+    mdl.add(keras.layers.MaxPooling2D(pool_size=(2, 2)))
+
+    mdl.add(keras.layers.Flatten())
+
     mdl.add(keras.layers.Dense(350, activation=tf.nn.elu))
     mdl.add(keras.layers.Dense(350, activation=tf.nn.elu))
 
