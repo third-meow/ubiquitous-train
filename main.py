@@ -18,6 +18,9 @@ xtest, ytest = load_mnist(DATASET_PATH, 't10k')
 xtrain = keras.utils.normalize(xtrain, axis=1)
 xtest = keras.utils.normalize(xtest, axis=1)
 
+#reshape data
+xtrain = xtrain.reshape((-1, 28,28, 1))
+xtest = xtest.reshape((-1, 28,28, 1))
 
 #main script
 def main():
